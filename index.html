@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0e2a24">
+<meta name="description" content="ReturnPlay — أداة مساعدة لتوليد برامج تدريبية تأهيلية للرياضيين المصابين، مدعومة برسوم توضيحية وفيديوهات شرح، تعمل بالكامل على جهازك.">
+<title>ReturnPlay | مولّد برامج التأهيل</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=2">
+<script src="qrcode.min.js?v=2" defer></script>
+<script src="data.js?v=2" defer></script>
+<script src="app.js?v=2" defer></script>
+</head>
+<body>
+<div class="disclaimer-bar">⚠️ هذه الأداة تُعدّ <b>مسودة برنامج تدريبي</b> للمساعدة فقط — القرار النهائي بالتمارين والجرعات والعودة للملاعب يبقى للطبيب وأخصائي التأهيل.</div>
+
+<div class="backup-banner" id="backupBanner" hidden>
+  <span id="backupBannerText"></span>
+  <button class="mini-btn" type="button" id="backupNowBtn">⬇ تصدير نسخة الآن</button>
+  <button class="mini-btn danger" type="button" id="backupDismissBtn">لاحقًا ✕</button>
+</div>
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none"><path d="M9 34c4-9 11-13 20-13-2 7-6 11-11 12 6 1 12-1 16-6 3 8-2 15-12 15-6 0-11-3-13-8Z" fill="currentColor"/><path d="M27 8c6 0 11 4 12 10-5 0-9-2-11-6-3 4-8 5-12 3 2-4 6-7 11-7Z" fill="currentColor" opacity=".55"/></svg>
+      </div>
+      <div><div class="brand-name">RETURN<b>PLAY</b></div><div class="brand-caption">مولّد برامج التأهيل</div></div>
+    </div>
+
+    <button class="btn btn-primary btn-block" id="addPlayerBtn" type="button">＋ إضافة لاعب</button>
+
+    <p class="sidebar-label">القائمة</p>
+    <nav class="main-nav" aria-label="التنقل الرئيسي">
+      <button class="nav-link active" type="button" data-view="players"><span class="nav-glyph">▦</span> اللاعبون والحالات</button>
+      <button class="nav-link" type="button" data-view="library"><span class="nav-glyph">▤</span> مكتبة التمارين <span class="nav-count" id="navExCount">0</span></button>
+      <button class="nav-link" type="button" data-view="prevention"><span class="nav-glyph">🛡</span> برامج الوقاية</button>
+      <button class="nav-link" type="button" data-view="settings"><span class="nav-glyph">◈</span> النسخ الاحتياطي</button>
+    </nav>
+
+    <div class="sidebar-spacer"></div>
+    <div class="sidebar-note">
+      <span class="status-dot"></span>
+      <div><strong>بياناتك محفوظة محليًا</strong><small>على هذا الجهاز فقط — خُذ نسخة احتياطية من صفحة النسخ الاحتياطي</small></div>
+    </div>
+  </aside>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <div class="main-wrap">
+    <header class="topbar">
+      <button class="icon-button mobile-menu" id="mobileMenu" type="button" aria-label="فتح القائمة">☰</button>
+      <div class="breadcrumbs" id="breadcrumb">اللاعبون والحالات</div>
+      <div class="topbar-right">
+        <span class="top-date" id="todayLabel"></span>
+      </div>
+    </header>
+
+    <main class="page-main">
+
+      <!-- ===== اللاعبون ===== -->
+      <section id="view-players" class="page-section">
+        <div class="page-heading">
+          <div>
+            <span class="section-overline">SQUAD HEALTH</span>
+            <h2>اللاعبون والحالات</h2>
+            <p>اختار منطقة المشكلة من جسم اللاعب، اكتب وصف الإصابة بكلامك (أو ارفع التقرير)، والأداة تولّد لك البرنامج.</p>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary btn-lg" type="button" id="quickStartBtn">🚑 عندي لاعب مصاب — ابدأ هنا</button>
+            <button class="btn btn-plain" type="button" id="addPlayerBtn2">＋ إضافة لاعب</button>
+          </div>
+        </div>
+
+        <div class="how-grid">
+          <div class="how-card"><span class="how-num">1</span><strong>سجّل الإصابة</strong><p>منطقة الجسم + نوع الإصابة من التقرير الطبي + التصريح الحالي.</p></div>
+          <div class="how-card"><span class="how-num">2</span><strong>ولّد البرنامج</strong><p>الأداة ترشح تمارين المرحلة المناسبة وتقترح الجرعات — عدّلها كما تريد.</p></div>
+          <div class="how-card"><span class="how-num">3</span><strong>اطبع وتابع</strong><p>اطبع البرنامج للاعب بفيديوهات الشرح، وسجّل الألم بعد كل جلسة.</p></div>
+        </div>
+
+        <h3 class="list-title">قائمة اللاعبين <span class="tag subtle" id="playersCount">0</span></h3>
+        <div class="players-grid" id="playersGrid"></div>
+      </section>
+
+      <!-- ===== ملف اللاعب ===== -->
+      <section id="view-player" class="page-section" hidden></section>
+
+      <!-- ===== معالج إصابة جديدة (٣ خطوات مبسطة) ===== -->
+      <section id="view-injury" class="page-section" hidden>
+        <div class="page-heading">
+          <div>
+            <span class="section-overline">NEW INJURY — EASY MODE</span>
+            <h2 id="injuryTitle">تسجيل إصابة جديدة</h2>
+            <p>٣ خطوات بسيطة — ومنها بتطلع مسودة البرنامج. مفيش مجاملات تقنية، وكل حاجة قابلة للتعديل بعدين.</p>
+          </div>
+          <div class="player-picker" id="injuryPlayerInfo"></div>
+        </div>
+
+        <form id="injuryForm" novalidate>
+          <!-- الخطوة ١: المناطق -->
+          <div class="card step-card">
+            <div class="step-head">
+              <span class="step-pill">1</span>
+              <div><h3>فين المشكلة؟</h3><p>اضغط على كل منطقة فيها ألم — <b>ممكن تختار أكتر من منطقة</b>، واضغط تاني لتلغي.</p></div>
+              <span class="tag green" id="regionsCountTag">0 مناطق</span>
+            </div>
+            <div class="bodymap-wrap">
+              <div class="bodymap" id="bodyMap" role="group" aria-label="خريطة الجسم — اختر كل المناطق المؤلمة"></div>
+              <div id="regionChips" role="group" aria-label="مناطق الجسم"></div>
+            </div>
+          </div>
+
+          <!-- الخطوة ٢: الوصف والتقرير -->
+          <div class="card step-card">
+            <div class="step-head">
+              <span class="step-pill">2</span>
+              <div><h3>احكي عن الإصابة</h3><p>اكتبها بالعامية كأنك بتتكلم مع حد — مثال: «من أسبوعين عندي شد في القطنية يمين بيجيب ألم لما أجري»</p></div>
+            </div>
+            <label class="field"><span class="sr-only">وصف الإصابة</span>
+              <textarea id="injDescribe" rows="4" placeholder="اكتب وصف الإصابة هنا: بدأت إمتى؟ بتوجع إمتى؟ شكلها إيه؟"></textarea>
+            </label>
+            <div class="upload-row">
+              <button type="button" class="btn btn-secondary" id="uploadReportBtn">📄 ارفع التقرير الطبي (صورة أو PDF)</button>
+              <input type="file" id="reportFile" accept=".pdf,image/jpeg,image/png,image/webp,application/pdf" hidden>
+              <span class="player-meta" id="reportFileInfo"></span>
+              <button type="button" class="mini-btn" id="clearReportBtn" hidden>إزالة الملف ✕</button>
+            </div>
+            <div class="ai-status" id="aiStatus"></div>
+            <div class="understanding" id="understanding" hidden>
+              <div class="understanding-title">🧠 فهمت من اللي كتبته:</div>
+              <div class="understanding-chips" id="understandingChips"></div>
+              <p class="minor">ده فهم مبدئي — راجعه وصححه في الخطوة ٣ لو في حاجة غلط.</p>
+            </div>
+          </div>
+
+          <!-- الخطوة ٣: مراجعة سريعة -->
+          <div class="card step-card">
+            <div class="step-head">
+              <span class="step-pill">3</span>
+              <div><h3>مراجعة سريعة</h3><p>محللنا عبّا الآتي — صحّح لو محتاج (اختياري لو الوصف واضح)</p></div>
+            </div>
+            <div class="quick-group"><span class="quick-label">نوع المشكلة</span><div class="quick-chips" id="quickType"></div></div>
+            <div class="quick-group"><span class="quick-label">الشدة</span><div class="quick-chips" id="quickGrade"></div></div>
+            <div class="quick-group"><span class="quick-label">الجهة</span><div class="quick-chips" id="quickSide"></div></div>
+            <div class="pain-row">
+              <div class="pain-title"><span>الألم حاليًا</span><strong><span id="painValue">3</span> / 10</strong></div>
+              <input type="range" id="injPain" min="0" max="10" value="3">
+            </div>
+            <div class="quick-group"><span class="quick-label">قرار الطبيب</span><div class="quick-chips" id="quickClearance"></div></div>
+            <details class="advanced">
+              <summary>تفاصيل إضافية (اختياري): تاريخ الإصابة، ملخص التقرير، المحظورات</summary>
+              <label class="field"><span>تاريخ الإصابة</span><input type="date" id="injDate"></label>
+              <label class="field"><span>ملخص التقرير الطبي</span><textarea id="injReport" rows="3" placeholder="بيتعبّى تلقائيًا لو رفعت تقرير — أو اكتبه يدويًا"></textarea></label>
+              <label class="field"><span>المحظورات والتعليمات</span><textarea id="injRestrictions" rows="2" placeholder="مثال: ممنوع الجري والقفز — بيتعبّى تلقائيًا من التحليل"></textarea></label>
+            </details>
+          </div>
+
+          <div class="form-footer">
+            <button class="btn btn-primary btn-lg" type="submit">✨ ولّد البرنامج التدريبي</button>
+            <button class="btn btn-plain" type="button" id="injuryCancel">إلغاء</button>
+            <p class="form-message" id="injuryMessage" role="alert"></p>
+          </div>
+        </form>
+      </section>
+
+      <!-- ===== مولّد / محرر البرنامج ===== -->
+      <section id="view-builder" class="page-section" hidden></section>
+
+      <!-- ===== عرض البرنامج ===== -->
+      <section id="view-program" class="page-section" hidden></section>
+
+      <!-- ===== شيت الجلسة اليومي (طباعة + QR) ===== -->
+      <section id="view-sheet" class="page-section" hidden></section>
+
+      <!-- ===== تقرير للطبيب / أخصائي التأهيل ===== -->
+      <section id="view-doctor" class="page-section" hidden></section>
+
+      <!-- ===== برامج الوقاية الجماعية ===== -->
+      <section id="view-prevention" class="page-section" hidden>
+        <div class="page-heading">
+          <div>
+            <span class="section-overline">PREVENTION — WHOLE TEAM</span>
+            <h2>برامج الوقاية الجماعية</h2>
+            <p>بروتوكولات وقاية جاهزة للفريق كله بدون أي إصابة — إحماء قبل التدريب ووقاية أشهر الإصابات. اختار برنامج واطبعه أو شاركه.</p>
+          </div>
+        </div>
+        <div class="prevention-grid" id="preventionGrid"></div>
+        <div id="preventionSheetWrap" hidden>
+          <div class="prog-toolbar no-print">
+            <button class="btn btn-primary" type="button" id="prevPrintBtn">🖨 طباعة / حفظ PDF</button>
+            <button class="btn btn-secondary" type="button" id="prevShareBtn">💬 إرسال واتساب</button>
+            <button class="btn btn-plain" type="button" id="prevCopyBtn">🔗 نسخ رابط المشاركة</button>
+            <button class="btn btn-plain" type="button" id="prevBackBtn">← كل البرامج</button>
+          </div>
+          <div class="print-sheet" id="preventionSheet"></div>
+        </div>
+      </section>
+
+      <!-- ===== عرض برنامج مشترك (قراءة فقط عبر رابط) ===== -->
+      <section id="view-share" class="page-section" hidden></section>
+
+      <!-- ===== مكتبة التمارين ===== -->
+      <section id="view-library" class="page-section" hidden>
+        <div class="page-heading">
+          <div>
+            <span class="section-overline">EXERCISE LIBRARY</span>
+            <h2>مكتبة التمارين</h2>
+            <p>كل تمرين برسم توضيحي وشرح وتصحيحات أداء وفيديو — ويمكنك إضافة تمارينك الخاصة.</p>
+          </div>
+          <button class="btn btn-secondary" type="button" id="addExerciseBtn">＋ تمرين خاص</button>
+        </div>
+        <div class="filters-card">
+          <div class="search-field"><span class="search-glyph">⌕</span><input id="exSearch" type="search" placeholder="ابحث باسم التمرين أو العضلة أو النمط..."></div>
+          <div class="filter-row">
+            <div class="filter-tabs" id="regionFilters"></div>
+            <select id="phaseFilter" class="select-inline">
+              <option value="all">كل المراحل</option>
+              <option value="acute">المرحلة ١ — تهدئة وحماية</option>
+              <option value="subacute">المرحلة ٢ — حركة وتنشيط</option>
+              <option value="strength">المرحلة ٣ — قوة</option>
+              <option value="rtp">المرحلة ٤ — عودة للملاعب</option>
+            </select>
+          </div>
+        </div>
+        <div class="exercise-grid" id="exerciseGrid"></div>
+      </section>
+
+      <!-- ===== النسخ الاحتياطي ===== -->
+      <section id="view-settings" class="page-section" hidden>
+        <div class="page-heading">
+          <div>
+            <span class="section-overline">DATA & BACKUP</span>
+            <h2>النسخ الاحتياطي والإعدادات</h2>
+            <p>بياناتك محفوظة في متصفح هذا الجهاز فقط — صدّرها دوريًا كملف وانقلها لأي جهاز آخر.</p>
+          </div>
+        </div>
+        <div class="settings-grid">
+          <div class="card">
+            <h3>تصدير البيانات</h3>
+            <p>ملف JSON يحتوي كل اللاعبين والإصابات والبرامج والتمارين الخاصة.</p>
+            <button class="btn btn-primary" type="button" id="exportBtn">⬇ تصدير نسخة احتياطية</button>
+            <p class="minor" id="lastBackupInfo" style="margin-top:8px"></p>
+          </div>
+          <div class="card">
+            <h3>استيراد البيانات</h3>
+            <p>استرجاع من ملف نسخة احتياطية سابقة — سيتم استبدال البيانات الحالية.</p>
+            <input type="file" id="importFile" accept=".json" hidden>
+            <button class="btn btn-secondary" type="button" id="importBtn">⬆ اختيار ملف واستيراد</button>
+          </div>
+          <div class="card">
+            <h3>📲 ثبّت الأداة كتطبيق</h3>
+            <p>ثبّتها على شاشة موبايلك أو كمبيوترك: أيقونة زي أي تطبيق، تفتح من غير متصفح، وكل حاجة تشتغل أوفلاين.</p>
+            <button class="btn btn-secondary" type="button" id="installBtn" hidden>📲 تثبيت على هذا الجهاز</button>
+            <p class="minor" id="installStatus"></p>
+          </div>
+          <div class="card">
+            <h3>🎬 فيديوهاتك المحلية</h3>
+            <p>الفيديوهات اللي صوّرتها ورفعتها للتمارين تُحفظ هنا على جهازك وتشتغل أوفلاين (لا تدخل في ملف النسخة الاحتياطية).</p>
+            <p class="minor" id="mediaStats"></p>
+            <button class="btn btn-outline-danger" type="button" id="clearMediaBtn">حذف كل الفيديوهات المحلية</button>
+          </div>
+          <div class="card ai-card">
+            <h3>🤖 تحليل التقارير بالذكاء الاصطناعي <span class="tag amber">اختياري</span></h3>
+            <p>المحلل العربي المدمج يفهم الوصف المكتوب ونصوص الـ PDF <b>بدون أي إعداد</b>. ولو عايز الأداة تقرا تقارير الصور والمستندات المسوّدة تلقائيًا، فعّل مفتاحًا مجانيًا مرة واحدة:</p>
+            <ol class="ai-steps">
+              <li>افتح <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">aistudio.google.com/apikey</a> وسجّل بحساب جوجل</li>
+              <li>اضغط «Create API key» وانسخ المفتاح</li>
+              <li>الصقه هنا واحفظ — خلاص، مفعّل</li>
+            </ol>
+            <div class="video-save">
+              <input id="aiKeyInput" type="password" placeholder="الصق المفتاح هنا (يُحفظ على جهازك فقط)">
+              <button class="btn btn-secondary" type="button" id="saveAiKey">حفظ</button>
+              <button class="btn btn-plain" type="button" id="testAiKey">اختبر</button>
+              <button class="btn btn-plain" type="button" id="clearAiKey" hidden>إزالة</button>
+            </div>
+            <p class="minor" id="aiKeyStatus"></p>
+            <p class="minor">🔒 خصوصية: بدون مفتاح لا شيء يخرج من جهازك. لو فعّلت المفتاح، التقارير اللي ترفعها تُحلَّل على خدمة Google Gemini.</p>
+          </div>
+          <div class="card danger-card">
+            <h3>منطقة خطر</h3>
+            <p>حذف كل البيانات نهائيًا، أو إزالة بيانات التجربة فقط.</p>
+            <div class="btn-row">
+              <button class="btn btn-outline-danger" type="button" id="removeDemoBtn">إزالة بيانات التجربة</button>
+              <button class="btn btn-danger" type="button" id="wipeBtn">حذف كل البيانات</button>
+            </div>
+          </div>
+        </div>
+        <div class="card about-card">
+          <h3>عن الأداة</h3>
+          <p><b>ReturnPlay</b> أداة محلية تعمل بدون إنترنت أو خادم — تُنشئ مسودات برامج تأهيلية مبنية على قواعد عامة (منطقة الإصابة + نوعها + المرحلة). المحتوى التعليمي مستوحى من بروتوكولات تأهيل شائعة (برامج AAOS، بروتوكولات العودة للجري، تمارين الوقاية NFC/النورديك، إلخ) وهو للإرشاد فقط.</p>
+          <p class="minor">الفيديوهات تُبحث على يوتيوب عبر عبارات إنجليزية دقيقة، ويمكنك حفظ رابط فيديو مفضل لكل تمرين فتظهر مدمجة داخل الأداة.</p>
+        </div>
+      </section>
+
+    </main>
+    <footer class="footer">ReturnPlay <span>•</span> أداة مساعدة للتخطيط — لا تغني عن الطبيب أو أخصائي العلاج الطبيعي</footer>
+  </div>
+</div>
+
+<!-- نوافذ -->
+<div class="modal-backdrop" id="modalRoot" hidden>
+  <div class="modal" role="dialog" aria-modal="true" id="modalBox"></div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
